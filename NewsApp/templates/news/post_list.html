@@ -1,0 +1,16 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block content %}
+  <h1>Все новости</h1>
+  <ul>
+    {% for post in posts %}
+      <li>
+        <a href="{% url 'post_detail' post.pk %}">{{ post.title|censor }}</a> - {{ post.dateCreation|date:"d M Y H:i" }}
+        <!-- Можно добавить и другие поля -->
+      </li>
+    {% empty %}
+      <li>Нет новостей</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

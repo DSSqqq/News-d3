@@ -30,6 +30,8 @@ class Author(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
+from django.db import models
+
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
@@ -39,20 +41,27 @@ class Post(models.Model):
         (NEWS, 'Новость'),
         (ARTICLE, 'Статья')
     )
-    # Поле выбора
-    categoryType = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
-    # Дата создания (auto_now_add=True) автоматически добавляет время создания
+    # Поле выбора категории
+    categoryType = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=NEWS)
+    # Дата создания
     dateCreation = models.DateTimeField(auto_now_add=True)
     # Связное поле с категорией
-    postCategory = models.ManyToManyField(Category, through= 'PostCategory')
+    postCategory = models.ManyToManyField(Category, through='PostCategory')
     # Заголовок
     title = models.CharField(max_length=128)
-    # Не ограничиваем пользователей в кол-ве символов
+    # Текст статьи
     text = models.TextField()
     # Рейтинг
     rating = models.SmallIntegerField(default=0)
 
-# Прибавляем либо отнимаем 1 в поле рейтинга
+    def __str__(self):
+        return self.title
+
+    # Метод для получения превью текста
+    def preview(self):
+        return self.text[:20] + '...'
+
+    # Метод для подсчета рейтинга
     def like(self):
         self.rating += 1
         self.save()
@@ -60,6 +69,9 @@ class Post(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+    class Meta:
+        ordering = ['-dateCreation']  # Сортировка от более свежих к старым
 
 # этот метод берет с поста первые 123 символа и в конце ставит многоточие
     def preview(self):

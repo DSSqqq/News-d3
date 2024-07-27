@@ -1,0 +1,10 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block content %}
+  <h1>{{ post.title|censor }}</h1>
+  <p><strong>Автор:</strong> {{ post.author.authorUser.username }}</p>
+  <p><strong>Дата создания:</strong> {{ post.dateCreation|date:"d M Y H:i" }}</p>
+  <p>{{ post.text|censor }}</p> <!-- Применение фильтра censor к содержимому новости -->
+  <!-- Можно добавить и другие поля -->
+{% endblock %}
