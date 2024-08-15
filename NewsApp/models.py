@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
-
+from django.urls import reverse
 
 class Author(models.Model):
     authorUser = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,6 +29,8 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    def __str__(self):
+        return self.name
 
 from django.db import models
 
@@ -53,6 +55,9 @@ class Post(models.Model):
     text = models.TextField()
     # Рейтинг
     rating = models.SmallIntegerField(default=0)
+
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
 
     def __str__(self):
         return self.title

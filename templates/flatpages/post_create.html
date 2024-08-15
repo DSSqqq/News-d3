@@ -1,0 +1,12 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+  <h1>Создать новость</h1>
+  <hr>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Отображение формы как абзацы -->
+    <button type="submit">Сохранить</button>
+  </form>
+  <a href="{% url 'post_list' %}">Вернуться к списку новостей</a>
+{% endblock %}

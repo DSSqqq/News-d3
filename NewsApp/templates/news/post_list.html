@@ -3,14 +3,40 @@
 
 {% block content %}
   <h1>Все новости</h1>
+
+  <!-- Ссылка на страницу поиска -->
+  <a href="{% url 'post_search' %}">Поиск новостей</a>
+
+  <!-- Форма фильтрации -->
+
   <ul>
     {% for post in posts %}
       <li>
         <a href="{% url 'post_detail' post.pk %}">{{ post.title|censor }}</a> - {{ post.dateCreation|date:"d M Y H:i" }}
-        <!-- Можно добавить и другие поля -->
       </li>
     {% empty %}
       <li>Нет новостей</li>
     {% endfor %}
   </ul>
+
+  <!-- Пагинация -->
+  <div class="pagination" style="text-align: center; margin-top: 20px;">
+    {% if page_obj.has_previous %}
+      <a href="?page=1" style="margin: 0 5px; text-decoration: none;">Первая</a>
+      {% if page_obj.number > 2 %}
+        ...
+      {% endif %}
+      <a href="?page={{ page_obj.previous_page_number }}" style="margin: 0 5px; text-decoration: none;">{{ page_obj.previous_page_number }}</a>
+    {% endif %}
+
+    <span style="margin: 0 5px; font-weight: bold;">{{ page_obj.number }}</span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" style="margin: 0 5px; text-decoration: none;">{{ page_obj.next_page_number }}</a>
+      {% if page_obj.number < page_obj.paginator.num_pages|add:-1 %}
+        ...
+      {% endif %}
+      <a href="?page={{ page_obj.paginator.num_pages }}" style="margin: 0 5px; text-decoration: none;">Последняя</a>
+    {% endif %}
+  </div>
 {% endblock %}
