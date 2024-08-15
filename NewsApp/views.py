@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from .filters import PostFilter
 from .forms import PostForm
@@ -42,16 +43,16 @@ class PostSearchView(ListView):
         return context
 
 
-def create_news(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('post_list')
-    else:
-        form = PostForm()
+class PostCreateView(CreateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news/post_create.html'
+class PostUpdateView(UpdateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news/post_create.html'
 
-    # Отладочный вывод данных формы в консоль
-    print(form.as_p())
-
-    return render(request, 'post_crate.html', {'form': form})
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = 'news/post_delete.html'
+    success_url = reverse_lazy('Post_list')
