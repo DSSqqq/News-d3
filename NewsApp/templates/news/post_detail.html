@@ -6,5 +6,11 @@
   <p><strong>Автор:</strong> {{ post.author.authorUser.username }}</p>
   <p><strong>Дата создания:</strong> {{ post.dateCreation|date:"d M Y H:i" }}</p>
   <p>{{ post.text|censor }}</p> <!-- Применение фильтра censor к содержимому новости -->
-  <!-- Можно добавить и другие поля -->
+
+  <!-- Ссылки на редактирование и удаление -->
+  <a href="{% url 'post_update' post.pk %}">Редактировать</a>
+  <a href="{% url 'post_delete' post.pk %}">Удалить</a>
+
+  <!-- Ссылка на возвращение к списку новостей -->
+  <a href="{% url 'post_list' %}">Вернуться к списку</a>
 {% endblock %}

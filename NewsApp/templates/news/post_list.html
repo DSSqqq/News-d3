@@ -13,6 +13,9 @@
     {% for post in posts %}
       <li>
         <a href="{% url 'post_detail' post.pk %}">{{ post.title|censor }}</a> - {{ post.dateCreation|date:"d M Y H:i" }}
+        <!-- Ссылки на обновление и удаление -->
+        <a href="{% url 'post_update' post.pk %}">Обновить</a>
+        <a href="{% url 'post_delete' post.pk %}" onclick="return confirm('Вы уверены, что хотите удалить эту новость?');">Удалить</a>
       </li>
     {% empty %}
       <li>Нет новостей</li>

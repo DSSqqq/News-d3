@@ -10,12 +10,14 @@ class PostForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Текст статьи'}),
             'categoryType': forms.Select(attrs={'class': 'form-control'}),
             'postCategory': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'author': forms.HiddenInput(),  # Прятать поле автор (если оно должно быть установлено программно)
         }
         labels = {
             'title': 'Заголовок',
             'text': 'Текст статьи',
             'categoryType': 'Тип публикации',
             'postCategory': 'Категория',
+            'author': 'Автор',
         }
 
     def clean_title(self):

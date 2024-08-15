@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.http import HttpResponseForbidden
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
@@ -13,7 +14,6 @@ class PostListView(ListView):
     paginate_by = 10  # Количество новостей на одной странице
 
     def get_queryset(self):
-        # Получаем обычный запрос
         queryset = super().get_queryset()
         return queryset
 
@@ -25,6 +25,12 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'news/post_detail.html'
     context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавляем в контекст флаг, определяющий, является ли текущий пользователь автором
+        context['is_author'] = self.object.author == self.request.user
+        return context
 
 class PostSearchView(ListView):
     model = Post
@@ -42,17 +48,41 @@ class PostSearchView(ListView):
         context['filterset'] = self.filterset
         return context
 
-
 class PostCreateView(CreateView):
-    form_class = PostForm
     model = Post
-    template_name = 'news/post_create.html'
-class PostUpdateView(UpdateView):
     form_class = PostForm
-    model = Post
     template_name = 'news/post_create.html'
+    success_url = reverse_lazy('post_list')
 
-class PostDeleteView(DeleteView):
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'news/post_update.html'
+    success_url = reverse_lazy('post_list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            raise PermissionDenied("Вы не имеете права изменять эту новость.")
+        return super().handle_no_permission()
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'news/post_delete.html'
-    success_url = reverse_lazy('Post_list')
+    success_url = reverse_lazy('post_list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            raise PermissionDenied("Вы не имеете права удалять эту новость.")
+        return super().handle_no_permission()
