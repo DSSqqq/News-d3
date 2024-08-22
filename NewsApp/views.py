@@ -1,4 +1,5 @@
 from django.http import HttpResponseForbidden
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
@@ -48,7 +49,8 @@ class PostSearchView(ListView):
         context['filterset'] = self.filterset
         return context
 
-class PostCreateView(CreateView):
+class PostCreateView(PermissionRequiredMixin,CreateView):
+    permission_required= ('NewsApp.create_post')
     model = Post
     form_class = PostForm
     template_name = 'news/post_create.html'
@@ -58,7 +60,8 @@ class PostCreateView(CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class PostUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required= ('NewsApp.update_post')
     model = Post
     form_class = PostForm
     template_name = 'news/post_update.html'
@@ -73,7 +76,8 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             raise PermissionDenied("Вы не имеете права изменять эту новость.")
         return super().handle_no_permission()
 
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class PostDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required= ('NewsApp.delete_post')
     model = Post
     template_name = 'news/post_delete.html'
     success_url = reverse_lazy('post_list')
